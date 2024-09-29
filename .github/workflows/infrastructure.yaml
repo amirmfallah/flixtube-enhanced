@@ -1,0 +1,64 @@
+#
+# GitHub Actions workflow.
+#
+# Deploys RabbitMQ and MongoDB database.
+#
+
+name: Deploy infrastructure
+
+on:
+  #
+  # Allows deployment to be invoked manually through the GitHub Actions user interface.
+  #
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE.
+      - uses: actions/checkout@v3
+
+      # Installs the Azure CLI.
+      - uses: azure/login@v1
+        with:
+          creds: ${{ env.AZURE_CREDENTIALS }}
+
+      # Installs the Terraform CLI.
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Deploys the infrastructure.
+      - name: Terraform Actions
+        working-directory: ./terraform
+        run: |
+          terraform init
+          terraform validate
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: "amirflixtube"
+          cluster-name: "amirflixtube"
+
+      #
+      # Deploys MongoDB.
+      #
+      - name: Deploy MongoDB
+        run: kubectl apply -f ./scripts/cd/mongodb.yaml
+
+      #
+      # Deploys RabbitMQ.
+      #
+      - name: Deploy Rabbit
+        run: kubectl apply -f ./scripts/cd/rabbit.yaml
