@@ -36,6 +36,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE.
       - uses: actions/checkout@v3
 
+      # Sets up Node.js.
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.x"
+          cache: "npm"
+
+      # Installs the Azure CLI.
+      - name: Install Node.js dependencies
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm ci
+
+      # Runs the tests.
+      - name: Run tests
+        working-directory: ${{ env.DIRECTORY }}
+        run: npm test
+
       #
       # Builds the Docker image.
       #
