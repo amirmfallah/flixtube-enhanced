@@ -19,7 +19,6 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE.
@@ -28,7 +27,7 @@ jobs:
       # Installs the Azure CLI.
       - uses: azure/login@v1
         with:
-          creds: ${{ env.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # Installs the Terraform CLI.
       - name: Install Terraform

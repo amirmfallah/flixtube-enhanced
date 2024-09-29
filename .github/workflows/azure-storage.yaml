@@ -52,16 +52,18 @@ jobs:
       - name: Publish
         run: ./scripts/cd/push-image.sh
 
-      #
-      # Installs Kubectl and connects it to the cluster.
-      #
-      # https://github.com/marketplace/actions/kubernetes-cli-kubectl
-      #
-      - uses: tale/kubectl-action@v1
+      # Installs the Azure CLI.
+      - uses: azure/login@v1
         with:
-          base64-kube-config: ${{ secrets.KUBE_CONFIG }}
-          kubectl-version: v1.24.2
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: "amirflixtube"
+          cluster-name: "amirflixtube"
       #
       # Expands the configuration template and deploys the microservice.
       #
