@@ -8,10 +8,8 @@
 name: Deploy video-upload
 
 on:
-  #
-  # Deploys the microservice on push to the specified subdirectory in the main branch of this code repository.
-  #
-  push:
+  # Deploys the microservice on merge to the main branch of this code repository in the specified subdirectory.
+  pull_request:
     branches:
       - main
     paths:
